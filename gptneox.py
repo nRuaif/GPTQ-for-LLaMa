@@ -410,7 +410,7 @@ if __name__ == '__main__':
             dataset, seed=args.seed, model=args.model, seqlen=model.seqlen, use_fast=True
         )
         print(dataset)
-        # gptneox_eval(model, testloader, DEV)
+        gptneox_eval(model, testloader, DEV)
 
     if args.save:
         gptneox_pack(model, quantizers, args.wbits)

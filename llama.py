@@ -15,8 +15,8 @@ def get_llama(model):
     torch.nn.init.kaiming_uniform_ = skip
     torch.nn.init.uniform_ = skip
     torch.nn.init.normal_ = skip
-    from transformers import LLaMAForCausalLM
-    model = LLaMAForCausalLM.from_pretrained(model, torch_dtype='auto')
+    from transformers import LlamaForCausalLM
+    model = LlamaForCausalLM.from_pretrained(model, torch_dtype='auto')
     model.seqlen = 2048
     return model
 
@@ -100,13 +100,13 @@ def llama_sequential(model, dataloader, dev):
 
         layers[i] = layer.cpu()
         del layer
-        del gptq 
+        del gptq
         torch.cuda.empty_cache()
 
         inps, outs = outs, inps
 
     model.config.use_cache = use_cache
-    
+
     return quantizers
 
 @torch.no_grad()
@@ -157,7 +157,7 @@ def llama_eval(model, testenc, dev):
     for i in range(len(layers)):
         print(i)
         layer = layers[i].to(dev)
-        
+
         if args.nearest:
             subset = find_layers(layer)
             for name in subset:
@@ -217,18 +217,18 @@ def llama_pack(model, quantizers, wbits):
     return model
 
 def load_quant(model, checkpoint, wbits):
-    from transformers import LLaMAConfig, LLaMAForCausalLM 
-    config = LLaMAConfig.from_pretrained(model)
+    from transformers import LlamaConfig, LlamaForCausalLM
+    config = LlamaConfig.from_pretrained(model)
     def noop(*args, **kwargs):
         pass
-    torch.nn.init.kaiming_uniform_ = noop 
-    torch.nn.init.uniform_ = noop 
-    torch.nn.init.normal_ = noop 
+    torch.nn.init.kaiming_uniform_ = noop
+    torch.nn.init.uniform_ = noop
+    torch.nn.init.normal_ = noop
 
     torch.set_default_dtype(torch.half)
     transformers.modeling_utils._init_weights = False
     torch.set_default_dtype(torch.half)
-    model = LLaMAForCausalLM(config)
+    model = LlamaForCausalLM(config)
     torch.set_default_dtype(torch.float)
     model = model.eval()
     layers = find_layers(model)
@@ -356,7 +356,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--nearest', action='store_true',
         help='Whether to run the RTN baseline.'
-    ) 
+    )
     parser.add_argument(
         '--wbits', type=int, default=16, choices=[2, 3, 4, 8, 16],
         help='#bits to use for quantization; use 16 for evaluating base model.'
@@ -420,4 +420,4 @@ if __name__ == '__main__':
 
     if args.save:
         llama_pack(model, quantizers, args.wbits)
-        torch.save(model.state_dict(), args.save) 
+        torch.save(model.state_dict(), args.save)

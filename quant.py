@@ -186,7 +186,7 @@ class QuantLinear(nn.Module):
     def forward(self, x):
         outshape = list(x.shape)
         x = x.reshape(-1, x.shape[-1])
-        y = self.bias.clone().repeat(x.shape[0],1)
+        y = self.bias.clone().repeat(x.shape[0],1).float()
         outshape[-1] = self.bias.numel()
         dtype = x.dtype
         x = x.float()

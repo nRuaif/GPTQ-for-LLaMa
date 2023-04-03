@@ -3,7 +3,7 @@ import os
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 setup(
-    name=f"GPTQ-for-LLaMa",
+    name=f"gptq_llama",
     version=f"1",
     author="nRuaif",
     description="GPTQ-for-LLaMa",
